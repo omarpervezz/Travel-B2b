@@ -6,7 +6,7 @@ import PackageBookingData from "@/components/organisms/Booking/PackageBookingDat
 import CarBookingData from "@/components/organisms/Booking/CarBookingData";
 import TabNavigation from "@/components/molecules/global/TabNavigation";
 import Loader from "@/components/molecules/global/Loader";
-import { usePaginatedFetchData } from "@/hooks/useFetchData";
+import { usePaginatedFetchData } from "@/hooks/api/v1/useFetchData";
 import { LuPlaneTakeoff, LuDownload, LuHotel } from "react-icons/lu";
 import { IoPrintOutline } from "react-icons/io5";
 import { RiFilter2Line } from "react-icons/ri";
@@ -25,7 +25,7 @@ import { columns as hajjColumns } from "./HajjUmrahData";
 import { columns as flightColumns } from "./FlightBookingData";
 import { columns as packageColumns } from "./PackageBookingData";
 import { columns as visaColumns } from "./VisaData";
-
+import { bookingEndPointUrls } from "@/hooks/api/v1/endPointUrl";
 type Column = { key: string; label: string };
 export type DataRecord = Record<string, unknown>;
 
@@ -39,21 +39,24 @@ const columnMap: Record<number, Column[]> = {
 };
 
 const tabs = [
-  { label: "Flight", icon: <LuPlaneTakeoff size={20} className="hidden sm:block" /> },
-  { label: "Hotel", icon: <LuHotel size={20} className="hidden sm:block"  /> },
-  { label: "Package", icon: <GiPalmTree size={20} className="hidden sm:block"  /> },
-  { label: "Visa", icon: <TiWorldOutline size={20} className="hidden sm:block"  /> },
-  { label: "Car", icon: <FaCar size={20} className="hidden sm:block"  /> },
-  { label: "Hajj & Umrah", icon: <PiMosqueThin size={20} className="hidden sm:block"  /> },
-];
-
-const apiUrls: string[] = [
-  `${process.env.NEXT_PUBLIC_API_URL}/api/v1/booking/flight-booking`,
-  `${process.env.NEXT_PUBLIC_API_URL}/api/v1/booking/hotel-booking`,
-  `${process.env.NEXT_PUBLIC_API_URL}/api/v1/booking/package-booking`,
-  `${process.env.NEXT_PUBLIC_API_URL}/api/v1/booking/visa`,
-  `${process.env.NEXT_PUBLIC_API_URL}/api/v1/booking/car-booking`,
-  `${process.env.NEXT_PUBLIC_API_URL}/api/v1/booking/hajj-umrah`,
+  {
+    label: "Flight",
+    icon: <LuPlaneTakeoff size={20} className="hidden sm:block" />,
+  },
+  { label: "Hotel", icon: <LuHotel size={20} className="hidden sm:block" /> },
+  {
+    label: "Package",
+    icon: <GiPalmTree size={20} className="hidden sm:block" />,
+  },
+  {
+    label: "Visa",
+    icon: <TiWorldOutline size={20} className="hidden sm:block" />,
+  },
+  { label: "Car", icon: <FaCar size={20} className="hidden sm:block" /> },
+  {
+    label: "Hajj & Umrah",
+    icon: <PiMosqueThin size={20} className="hidden sm:block" />,
+  },
 ];
 
 const BookingTableWrapper: React.FC = () => {
@@ -67,7 +70,7 @@ const BookingTableWrapper: React.FC = () => {
   const limit = 12;
 
   const { data, isLoading, error, totalPages } = usePaginatedFetchData(
-    apiUrls,
+    bookingEndPointUrls,
     activeTab,
     currentPages[activeTab],
     limit
@@ -82,7 +85,7 @@ const BookingTableWrapper: React.FC = () => {
   };
 
   const handlePrint = () => {
-    const activeData = data[apiUrls[activeTab]] || [];
+    const activeData = data[bookingEndPointUrls[activeTab]] || [];
     setPrintData(activeData as DataRecord[]);
     setShowPrint(true);
   };
@@ -95,19 +98,19 @@ const BookingTableWrapper: React.FC = () => {
 
   const buttons = [
     {
-      label:<span className="hidden sm:block">Filter</span> ,
+      label: <span className="hidden sm:block">Filter</span>,
       onClick: () => console.log("Filter clicked"),
       icon: <RiFilter2Line size={20} />,
       className: "bg-[#FCAA22] hover:bg-[#ffb53d]",
     },
     {
-      label: <span  className="hidden sm:block">Export</span>,
+      label: <span className="hidden sm:block">Export</span>,
       onClick: handleExport,
       icon: <LuDownload size={20} />,
       className: "bg-[#20B038] hover:bg-[#257a33]",
     },
     {
-      label:<span  className="hidden sm:block">Print</span>,
+      label: <span className="hidden sm:block">Print</span>,
       onClick: handlePrint,
       icon: <IoPrintOutline size={20} />,
       className: "bg-[#1768D0] hover:bg-[#2e77d7]",
@@ -122,7 +125,7 @@ const BookingTableWrapper: React.FC = () => {
       case 0:
         return (
           <FlightBookingData
-            data={data[apiUrls[0]] || []}
+            data={data[bookingEndPointUrls[0]] || []}
             currentPage={currentPages[0]}
             totalPages={totalPages}
             onPageChange={(page: number) => handlePageChange(0, page)}
@@ -132,7 +135,7 @@ const BookingTableWrapper: React.FC = () => {
       case 1:
         return (
           <HotelBookingData
-            data={data[apiUrls[1]] || []}
+            data={data[bookingEndPointUrls[1]] || []}
             currentPage={currentPages[1]}
             totalPages={totalPages}
             onPageChange={(page: number) => handlePageChange(1, page)}
@@ -142,7 +145,7 @@ const BookingTableWrapper: React.FC = () => {
       case 2:
         return (
           <PackageBookingData
-            data={data[apiUrls[2]] || []}
+            data={data[bookingEndPointUrls[2]] || []}
             currentPage={currentPages[2]}
             totalPages={totalPages}
             onPageChange={(page: number) => handlePageChange(2, page)}
@@ -152,7 +155,7 @@ const BookingTableWrapper: React.FC = () => {
       case 3:
         return (
           <VisaData
-            data={data[apiUrls[3]] || []}
+            data={data[bookingEndPointUrls[3]] || []}
             currentPage={currentPages[3]}
             totalPages={totalPages}
             onPageChange={(page: number) => handlePageChange(3, page)}
@@ -162,7 +165,7 @@ const BookingTableWrapper: React.FC = () => {
       case 4:
         return (
           <CarBookingData
-            data={data[apiUrls[4]] || []}
+            data={data[bookingEndPointUrls[4]] || []}
             currentPage={currentPages[4]}
             totalPages={totalPages}
             onPageChange={(page: number) => handlePageChange(4, page)}
@@ -172,7 +175,7 @@ const BookingTableWrapper: React.FC = () => {
       case 5:
         return (
           <HajjUmrahData
-            data={data[apiUrls[5]] || []}
+            data={data[bookingEndPointUrls[5]] || []}
             currentPage={currentPages[5]}
             totalPages={totalPages}
             onPageChange={(page: number) => handlePageChange(5, page)}
@@ -192,7 +195,7 @@ const BookingTableWrapper: React.FC = () => {
       <Export
         ref={exportRef}
         columns={columnMap[activeTab]}
-        data={data[apiUrls[activeTab]] || []}
+        data={data[bookingEndPointUrls[activeTab]] || []}
         onExportComplete={() => console.log("Export completed!")}
       />
       {showPrint && (

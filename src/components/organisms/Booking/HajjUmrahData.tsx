@@ -9,7 +9,7 @@ import { ColumnConfig } from "@/components/molecules/global/Table";
 import DatePicker from "@/components/molecules/global/DatePicker";
 import { Button } from "@/components/atoms/Button";
 import { BookingPropsType } from "@/types/component";
-import { BookingDataType } from "@/hooks/useFetchData";
+import { BookingDataType } from "@/hooks/api/v1/useFetchData";
 
 export const columns: ColumnConfig[] = [
   { key: "issueDate", type: "text", label: "Issue Date" },
@@ -58,7 +58,7 @@ const HajjUmrahData: React.FC<BookingPropsType> = ({
 
   return (
     <div>
-    <div className="mt-5 grid grid-cols-1 lg:grid-cols-2 gap-4 ">
+      <div className="mt-5 grid grid-cols-1 lg:grid-cols-2 gap-4 ">
         <div className="flex  flex-col sm:flex-row sm:justify-start sm:items-center gap-2">
           <TableSearch
             searchQuery={searchQuery}
@@ -75,7 +75,7 @@ const HajjUmrahData: React.FC<BookingPropsType> = ({
           ))}
         </div>
         <div className="flex  items-start lg:items-center justify-start overflow-x-auto no-scrollbar lg:justify-end gap-4 ">
-          {actionButton.map((button, index) => (
+          {actionButton?.map((button, index) => (
             <Button
               key={index}
               onClick={button.onClick}
@@ -91,18 +91,17 @@ const HajjUmrahData: React.FC<BookingPropsType> = ({
         <div className="h-[67vh] mt-5">
           <Table data={filteredTableData} columns={columns} />
           <div className="flex justify-end">
-          {filteredTableData.length > 0 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={onPageChange}
-            />
-          )}
-        </div>
+            {filteredTableData.length > 0 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+              />
+            )}
+          </div>
         </div>
       </div>
-       
-        </div>
+    </div>
   );
 };
 

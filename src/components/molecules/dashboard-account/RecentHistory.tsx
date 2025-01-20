@@ -37,33 +37,30 @@ const RecentHistory: React.FC<RecentHistoryProps> = ({
 
   return (
     <div className="mt-6">
-     
-
       {isLoading ? (
-     <RecentTableLoader/>
+        <RecentTableLoader />
       ) : (
         <div>
-             <div className="flex items-center justify-between">
-        <div>
-          <CardTitle className="font-semibold text-xl text-[#243045] dark:text-white">
-            {title}
-          </CardTitle>
-          {subtitle && <Span>{subtitle}</Span>}
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="font-semibold text-xl text-[#243045] dark:text-white">
+                {title}
+              </CardTitle>
+              {subtitle && <Span>{subtitle}</Span>}
+            </div>
+            {onButtonClick && (
+              <Button
+                onClick={onButtonClick}
+                className="text-sm font-normal text-[#243045] p-2.5 rounded-md bg-[#EFEFEF] flex items-center gap-2 hover:bg-[#257CEB] hover:text-[#EDF2FD] duration-300"
+              >
+                {buttonLabel} <MdArrowForwardIos />
+              </Button>
+            )}
+          </div>
+          <div className="mt-5">
+            <Table data={data} columns={columns} />
+          </div>
         </div>
-        {onButtonClick && (
-          <Button
-            onClick={onButtonClick}
-            className="text-sm font-normal text-[#243045] p-2.5 rounded-md bg-[#EFEFEF] flex items-center gap-2 hover:bg-[#257CEB] hover:text-[#EDF2FD] duration-300"
-          >
-            {buttonLabel} <MdArrowForwardIos />
-          </Button>
-        )}
-      </div>
-        <div className="mt-5">
-          <Table data={data} columns={columns} />
-        </div>
-        </div>
-       
       )}
     </div>
   );

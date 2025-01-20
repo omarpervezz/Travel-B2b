@@ -1,17 +1,16 @@
 "use client";
 import { useState, useRef } from "react";
 import Loader from "@/components/molecules/global/Loader";
-import { usePaginatedFetchData } from "@/hooks/useFetchData";
+import { usePaginatedFetchData } from "@/hooks/api/v1/useFetchData";
 import { RiFilter2Line } from "react-icons/ri";
 import { LuDownload } from "react-icons/lu";
 import { IoPrintOutline } from "react-icons/io5";
-
 import CustomerData from "./CustomerData";
-
 import { columns as customerColumn } from "./CustomerData";
 import Print from "@/components/molecules/global/Print";
 import Export from "@/components/molecules/global/Export";
 import { FaPlus } from "react-icons/fa6";
+import { customerEndPointUrls } from "@/hooks/api/v1/endPointUrl";
 
 // Define the type for the exportRef
 type ExportRef = {
@@ -25,10 +24,8 @@ const CustomerTableWrapper = () => {
   const exportRef = useRef<ExportRef | null>(null);
   const limit = 12;
 
-  const CustomerApiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/customer`;
-
   const { data, isLoading, error, totalPages } = usePaginatedFetchData(
-    [CustomerApiUrl],
+    [customerEndPointUrls],
     0,
     currentPage,
     limit
@@ -39,7 +36,7 @@ const CustomerTableWrapper = () => {
   };
 
   const handlePrint = () => {
-    const activeData = data[CustomerApiUrl] || [];
+    const activeData = data[customerEndPointUrls] || [];
     setPrintData(activeData as Record<string, unknown>[]);
     setShowPrint(true);
   };
@@ -72,7 +69,7 @@ const CustomerTableWrapper = () => {
     {
       label: "Add",
       onClick: handlePrint,
-      icon: <FaPlus  size={20} />,
+      icon: <FaPlus size={20} />,
       className: "bg-[#1768D0] hover:bg-[#2e77d7]",
     },
   ];
@@ -83,7 +80,7 @@ const CustomerTableWrapper = () => {
   return (
     <div className="p-5 rounded-md bg-white dark:bg-darkPrimaryBg">
       <CustomerData
-        data={data[CustomerApiUrl] || []}
+        data={data[customerEndPointUrls] || []}
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}
@@ -92,7 +89,7 @@ const CustomerTableWrapper = () => {
       <Export
         ref={exportRef}
         columns={customerColumn}
-        data={data[CustomerApiUrl] || []}
+        data={data[customerEndPointUrls] || []}
         onExportComplete={() => console.log("Export completed!")}
       />
       {/* Hidden Printable Component */}

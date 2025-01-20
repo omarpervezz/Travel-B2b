@@ -1,4 +1,4 @@
-import { BookingDataType } from "@/hooks/useFetchData";
+import { BookingDataType } from "@/hooks/api/v1/useFetchData";
 interface ActionButtonType {
   label: React.ReactNode;
   onClick: () => void;
@@ -10,5 +10,5 @@ export interface BookingPropsType {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-  actionButton: ActionButtonType[];
+  actionButton?: ActionButtonType[];
 }

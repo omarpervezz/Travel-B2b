@@ -1,33 +1,30 @@
 "use client";
-import { useState,useRef } from "react";
+import { useState, useRef } from "react";
 import Loader from "@/components/molecules/global/Loader";
-import { usePaginatedFetchData } from "@/hooks/useFetchData";
+import { usePaginatedFetchData } from "@/hooks/api/v1/useFetchData";
 import { RiFilter2Line } from "react-icons/ri";
 import { LuDownload } from "react-icons/lu";
 import { IoPrintOutline } from "react-icons/io5";
-
 import TransactionTableData from "./TransactionTableData";
-import { columns as TransactionTableColumn} from './TransactionTableData';
+import { columns as TransactionTableColumn } from "./TransactionTableData";
 import Print from "@/components/molecules/global/Print";
 import Export from "@/components/molecules/global/Export";
-
+import { transactionEndPointUrls } from "@/hooks/api/v1/endPointUrl";
 
 // Define the type for the exportRef
 type ExportRef = {
   handleExport: () => void;
 };
 
-
 const TransectionTableWraper = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [printData, setPrintData] = useState<Record<string, unknown>[]>([]);
-   const [showPrint, setShowPrint] = useState(false);
-   const exportRef = useRef<ExportRef | null>(null);
+  const [showPrint, setShowPrint] = useState(false);
+  const exportRef = useRef<ExportRef | null>(null);
   const limit = 12;
-     const TransectionApiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/transection`;
 
   const { data, isLoading, error, totalPages } = usePaginatedFetchData(
-    [TransectionApiUrl],
+    [transactionEndPointUrls],
     0,
     currentPage,
     limit
@@ -38,14 +35,13 @@ const TransectionTableWraper = () => {
   };
 
   const handlePrint = () => {
-    const activeData = data[TransectionApiUrl] || []
+    const activeData = data[transactionEndPointUrls] || [];
     setPrintData(activeData as Record<string, unknown>[]);
     setShowPrint(true);
   };
 
   const handleExport = () => {
     if (exportRef.current) {
-      
       exportRef.current.handleExport(); // Trigger export logic in the Export component
     }
   };
@@ -77,17 +73,17 @@ const TransectionTableWraper = () => {
   return (
     <div className=" p-5 bg-white rounded-md dark:bg-darkPrimaryBg">
       <TransactionTableData
-        data={data[TransectionApiUrl] || []}
+        data={data[transactionEndPointUrls] || []}
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}
         actionButton={buttons}
       />
 
-<Export
+      <Export
         ref={exportRef}
         columns={TransactionTableColumn}
-        data={data[TransectionApiUrl] || []} 
+        data={data[transactionEndPointUrls] || []}
         onExportComplete={() => console.log("Export completed!")}
       />
       {/* Hidden Printable Component */}

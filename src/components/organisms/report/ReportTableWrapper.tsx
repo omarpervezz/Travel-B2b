@@ -1,8 +1,8 @@
 "use client";
-import { useState,useRef } from "react";
+import { useState, useRef } from "react";
 import TabNavigation from "@/components/molecules/global/TabNavigation";
 import Loader from "@/components/molecules/global/Loader";
-import { usePaginatedFetchData } from "@/hooks/useFetchData";
+import { usePaginatedFetchData } from "@/hooks/api/v1/useFetchData";
 import { LuPlaneTakeoff } from "react-icons/lu";
 import { LuDownload } from "react-icons/lu";
 import { IoPrintOutline } from "react-icons/io5";
@@ -16,19 +16,17 @@ import Export from "@/components/molecules/global/Export";
 import { FaCar } from "react-icons/fa";
 import { PiMosqueThin } from "react-icons/pi";
 
-import ReportFlightData from './ReportFlightData';
-import ReportHotelData from './ReportHotelData';
-import ReportPackageData from './ReportPackageData'
+import ReportFlightData from "./ReportFlightData";
+import ReportHotelData from "./ReportHotelData";
+import ReportPackageData from "./ReportPackageData";
 import ReportCarData from "./ReportCarData";
 import ReportHajjData from "./ReportHajjData";
-
-import { columns as reportHotelColumns} from './ReportHotelData';
-import { columns as reportCarColumns} from './ReportCarData';
-import { columns as reportHajjColumns} from './ReportHajjData';
-import { columns as reportFlightColumns } from './ReportFlightData';
-import { columns as reportPackageColumns} from './ReportPackageData';
-
-
+import { columns as reportHotelColumns } from "./ReportHotelData";
+import { columns as reportCarColumns } from "./ReportCarData";
+import { columns as reportHajjColumns } from "./ReportHajjData";
+import { columns as reportFlightColumns } from "./ReportFlightData";
+import { columns as reportPackageColumns } from "./ReportPackageData";
+import { reportEndPointUrls } from "@/hooks/api/v1/endPointUrl";
 
 type Column = { key: string; label: string };
 type DataRecord = Record<string, unknown>;
@@ -37,44 +35,32 @@ const columnMap: Record<number, Column[]> = {
   0: reportFlightColumns,
   1: reportHotelColumns,
   2: reportPackageColumns,
-  3:reportCarColumns,
-  4:reportHajjColumns,
+  3: reportCarColumns,
+  4: reportHajjColumns,
 };
 
-
 const tabs = [
-  { label: "Flight", icon: <LuPlaneTakeoff size={20}/> },
+  { label: "Flight", icon: <LuPlaneTakeoff size={20} /> },
   { label: "Hotel", icon: <LuHotel size={20} /> },
   { label: "Package", icon: <GiPalmTree size={20} /> },
-  { label: "Car", icon: <FaCar  size={20} /> },
+  { label: "Car", icon: <FaCar size={20} /> },
   { label: "Hajj & Umrah", icon: <PiMosqueThin size={20} /> },
-
 ];
 
-
-
-const apiUrls = [
-  `${process.env.NEXT_PUBLIC_API_URL}/api/v1/report/report-flight`,
-  `${process.env.NEXT_PUBLIC_API_URL}/api/v1/report/report-hotel`,
-  `${process.env.NEXT_PUBLIC_API_URL}/api/v1/report/report-package`,
-  `${process.env.NEXT_PUBLIC_API_URL}/api/v1/report/report-car`,
-  `${process.env.NEXT_PUBLIC_API_URL}/api/v1/report/report-hajj`,
-];
-
-const ReportTableWrapper:React.FC = () => {
+const ReportTableWrapper: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [currentPages, setCurrentPages] = useState<number[]>(
     Array(tabs.length).fill(1)
   );
 
-    const [printData, setPrintData] = useState<DataRecord[]>([]);
-    const [showPrint, setShowPrint] = useState(false);
-    const exportRef = useRef<{ handleExport: () => void } | null>(null);
+  const [printData, setPrintData] = useState<DataRecord[]>([]);
+  const [showPrint, setShowPrint] = useState(false);
+  const exportRef = useRef<{ handleExport: () => void } | null>(null);
 
   const limit = 12;
 
   const { data, isLoading, error, totalPages } = usePaginatedFetchData(
-    apiUrls,
+    reportEndPointUrls,
     activeTab,
     currentPages[activeTab],
     limit
@@ -89,18 +75,16 @@ const ReportTableWrapper:React.FC = () => {
   };
 
   const handlePrint = () => {
-    const activeData = data[apiUrls[activeTab]] || [];
+    const activeData = data[reportEndPointUrls[activeTab]] || [];
     setPrintData(activeData);
     setShowPrint(true);
   };
 
   const handleExport = () => {
     if (exportRef.current) {
-      
       exportRef.current.handleExport(); // Trigger export logic in the Export component
     }
   };
-
 
   const buttons = [
     {
@@ -124,7 +108,7 @@ const ReportTableWrapper:React.FC = () => {
     {
       label: "Add",
       onClick: () => console.log("Add clicked"),
-      icon: <IoAddSharp  size={20} />,
+      icon: <IoAddSharp size={20} />,
       className: "bg-[#1768D0] hover:bg-[#2e77d7]",
     },
   ];
@@ -137,7 +121,7 @@ const ReportTableWrapper:React.FC = () => {
       case 0:
         return (
           <ReportFlightData
-            data={data[apiUrls[0]] || []}
+            data={data[reportEndPointUrls[0]] || []}
             currentPage={currentPages[0]}
             totalPages={totalPages}
             onPageChange={(page) => handlePageChange(0, page)}
@@ -147,7 +131,7 @@ const ReportTableWrapper:React.FC = () => {
       case 1:
         return (
           <ReportHotelData
-            data={data[apiUrls[1]] || []}
+            data={data[reportEndPointUrls[1]] || []}
             currentPage={currentPages[1]}
             totalPages={totalPages}
             onPageChange={(page) => handlePageChange(1, page)}
@@ -157,35 +141,35 @@ const ReportTableWrapper:React.FC = () => {
       case 2:
         return (
           <ReportPackageData
-            data={data[apiUrls[2]] || []}
+            data={data[reportEndPointUrls[2]] || []}
             currentPage={currentPages[2]}
             totalPages={totalPages}
             onPageChange={(page) => handlePageChange(2, page)}
             actionButton={buttons}
           />
         );
-        case 3:
-            return (
-              <ReportCarData
-                data={data[apiUrls[3]] || []}
-                currentPage={currentPages[3]}
-                totalPages={totalPages}
-                onPageChange={(page) => handlePageChange(3, page)}
-                actionButton={buttons}
-              />
-            );
-          
-            case 4:
-                return (
-                  <ReportHajjData
-                    data={data[apiUrls[4]] || []}
-                    currentPage={currentPages[4]}
-                    totalPages={totalPages}
-                    onPageChange={(page) => handlePageChange(4, page)}
-                    actionButton={buttons}
-                  />
-                );
-         
+      case 3:
+        return (
+          <ReportCarData
+            data={data[reportEndPointUrls[3]] || []}
+            currentPage={currentPages[3]}
+            totalPages={totalPages}
+            onPageChange={(page) => handlePageChange(3, page)}
+            actionButton={buttons}
+          />
+        );
+
+      case 4:
+        return (
+          <ReportHajjData
+            data={data[reportEndPointUrls[4]] || []}
+            currentPage={currentPages[4]}
+            totalPages={totalPages}
+            onPageChange={(page) => handlePageChange(4, page)}
+            actionButton={buttons}
+          />
+        );
+
       default:
         return null;
     }
@@ -198,13 +182,13 @@ const ReportTableWrapper:React.FC = () => {
       <Export
         ref={exportRef}
         columns={columnMap[activeTab]}
-        data={data[apiUrls[activeTab]] || []}
+        data={data[reportEndPointUrls[activeTab]] || []}
         onExportComplete={() => console.log("Export completed!")}
       />
       {/* Hidden Printable Component */}
       {showPrint && (
         <Print
-        title={"Report Table Data"}
+          title={"Report Table Data"}
           data={printData}
           columns={columnMap[activeTab]}
           onClose={() => setShowPrint(false)}

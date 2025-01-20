@@ -1,4 +1,4 @@
-import  { JSX, useEffect, useRef } from "react";
+import { JSX, useEffect, useRef } from "react";
 
 interface ColumnConfig {
   key: string; // Key used in data
@@ -26,7 +26,9 @@ const Print = <T extends Record<string, unknown>>({
 
     const printWindow = window.open("", "PRINT", "height=600,width=1000");
     if (!printWindow) {
-      alert("Unable to open print window. Please disable pop-up blockers and try again.");
+      alert(
+        "Unable to open print window. Please disable pop-up blockers and try again."
+      );
       onClose(); // Ensure cleanup if the window can't open
       return;
     }
@@ -126,7 +128,9 @@ const Print = <T extends Record<string, unknown>>({
               .map(
                 (row) => `
               <tr>
-                ${headerKeys.map((key) => `<td>${row[key] || ""}</td>`).join("")}
+                ${headerKeys
+                  .map((key) => `<td>${row[key] || ""}</td>`)
+                  .join("")}
               </tr>
             `
               )
@@ -143,7 +147,7 @@ const Print = <T extends Record<string, unknown>>({
 
     // Ensure cleanup
     onClose();
-  }, [columns, data, onClose,title]);
+  }, [columns, data, onClose, title]);
 
   return null;
 };

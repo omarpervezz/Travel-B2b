@@ -9,7 +9,7 @@ import DatePicker from "@/components/molecules/global/DatePicker";
 import Pagination from "@/components/molecules/global/Pagination";
 
 import { BookingPropsType } from "@/types/component";
-import { BookingDataType } from "@/hooks/useFetchData";
+import { BookingDataType } from "@/hooks/api/v1/useFetchData";
 import { Button } from "@/components/atoms/Button";
 
 export const columns: ColumnConfig[] = [
@@ -76,7 +76,7 @@ const HotelBookingData: React.FC<BookingPropsType> = ({
           ))}
         </div>
         <div className="flex  items-start lg:items-center justify-start overflow-x-auto no-scrollbar lg:justify-end gap-4 ">
-          {actionButton.map((button, index) => (
+          {actionButton?.map((button, index) => (
             <Button
               key={index}
               onClick={button.onClick}

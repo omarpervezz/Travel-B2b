@@ -2,7 +2,7 @@
 import { useState, useRef } from "react";
 import TabNavigation from "@/components/molecules/global/TabNavigation";
 import Loader from "@/components/molecules/global/Loader";
-import { usePaginatedFetchData } from "@/hooks/useFetchData";
+import { usePaginatedFetchData } from "@/hooks/api/v1/useFetchData";
 import { LuPlaneTakeoff } from "react-icons/lu";
 import { LuDownload } from "react-icons/lu";
 import { IoPrintOutline } from "react-icons/io5";
@@ -19,15 +19,12 @@ import RefundHotelData from "./RefundHotelData";
 import RefundPackageData from "./RefundPackageData";
 import RefundCarData from "./RefundCarData";
 import RefundHajjData from "./RefundHajjData";
-
-
-import { columns as refundHotelColumns} from './RefundHotelData';
-import { columns as refundCarColumns} from './RefundCarData';
-import { columns as refundHajjColumns} from './RefundHajjData';
-import { columns as refundFlightColumns } from './RefundFlightData';
-import { columns as refundPackageColumns} from './RefundPackageData';
-
-
+import { refundEndPointUrls } from "@/hooks/api/v1/endPointUrl";
+import { columns as refundHotelColumns } from "./RefundHotelData";
+import { columns as refundCarColumns } from "./RefundCarData";
+import { columns as refundHajjColumns } from "./RefundHajjData";
+import { columns as refundFlightColumns } from "./RefundFlightData";
+import { columns as refundPackageColumns } from "./RefundPackageData";
 
 type Column = { key: string; label: string };
 type DataRecord = Record<string, unknown>;
@@ -36,33 +33,19 @@ const columnMap: Record<number, Column[]> = {
   0: refundFlightColumns,
   1: refundHotelColumns,
   2: refundPackageColumns,
-  3:refundCarColumns,
-  4:refundHajjColumns,
+  3: refundCarColumns,
+  4: refundHajjColumns,
 };
 
-
 const tabs = [
-  { label: "Flight", icon: <LuPlaneTakeoff size={20}/> },
+  { label: "Flight", icon: <LuPlaneTakeoff size={20} /> },
   { label: "Hotel", icon: <LuHotel size={20} /> },
   { label: "Package", icon: <GiPalmTree size={20} /> },
-  { label: "Car", icon: <FaCar  size={20} /> },
+  { label: "Car", icon: <FaCar size={20} /> },
   { label: "Hajj & Umrah", icon: <PiMosqueThin size={20} /> },
-
 ];
 
-
-const apiUrls = [
-  `${process.env.NEXT_PUBLIC_API_URL}/api/v1/refund/refund-flight`,
-  `${process.env.NEXT_PUBLIC_API_URL}/api/v1/refund/refund-hotel`,
-  `${process.env.NEXT_PUBLIC_API_URL}/api/v1/refund/refund-package`,
-  `${process.env.NEXT_PUBLIC_API_URL}/api/v1/refund/refund-car`,
-  `${process.env.NEXT_PUBLIC_API_URL}/api/v1/refund/refund-hajj`,
-];
-
-
-
-
-const RefundTableWrapper:React.FC  = () => {
+const RefundTableWrapper: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [currentPages, setCurrentPages] = useState<number[]>(
     Array(tabs.length).fill(1)
@@ -73,7 +56,7 @@ const RefundTableWrapper:React.FC  = () => {
   const limit = 12;
 
   const { data, isLoading, error, totalPages } = usePaginatedFetchData(
-    apiUrls,
+    refundEndPointUrls,
     activeTab,
     currentPages[activeTab],
     limit
@@ -88,18 +71,16 @@ const RefundTableWrapper:React.FC  = () => {
   };
 
   const handlePrint = () => {
-    const activeData = data[apiUrls[activeTab]] || [];
+    const activeData = data[refundEndPointUrls[activeTab]] || [];
     setPrintData(activeData as DataRecord[]);
     setShowPrint(true);
   };
 
   const handleExport = () => {
     if (exportRef.current) {
-      
       exportRef.current.handleExport(); // Trigger export logic in the Export component
     }
   };
-
 
   const buttons = [
     {
@@ -107,7 +88,7 @@ const RefundTableWrapper:React.FC  = () => {
       onClick: () => console.log("Filter clicked"),
       icon: <RiFilter2Line size={20} />,
       className: "bg-[#FCAA22] hover:bg-[#ffb53d] cursor-not-allowed",
-      disable:true,
+      disable: true,
     },
     {
       label: "Export",
@@ -125,11 +106,10 @@ const RefundTableWrapper:React.FC  = () => {
     {
       label: "Add",
       onClick: () => console.log("Add clicked"),
-      icon: <IoAddSharp  size={20} />,
+      icon: <IoAddSharp size={20} />,
       className: "bg-[#1768D0] hover:bg-[#2e77d7]",
     },
   ];
-  
 
   const renderTabContent = () => {
     if (isLoading) return <Loader />;
@@ -139,7 +119,7 @@ const RefundTableWrapper:React.FC  = () => {
       case 0:
         return (
           <RefundFlightData
-            data={data[apiUrls[0]] || []}
+            data={data[refundEndPointUrls[0]] || []}
             currentPage={currentPages[0]}
             totalPages={totalPages}
             onPageChange={(page) => handlePageChange(0, page)}
@@ -149,7 +129,7 @@ const RefundTableWrapper:React.FC  = () => {
       case 1:
         return (
           <RefundHotelData
-            data={data[apiUrls[1]] || []}
+            data={data[refundEndPointUrls[1]] || []}
             currentPage={currentPages[1]}
             totalPages={totalPages}
             onPageChange={(page) => handlePageChange(1, page)}
@@ -159,35 +139,35 @@ const RefundTableWrapper:React.FC  = () => {
       case 2:
         return (
           <RefundPackageData
-            data={data[apiUrls[2]] || []}
+            data={data[refundEndPointUrls[2]] || []}
             currentPage={currentPages[2]}
             totalPages={totalPages}
             onPageChange={(page) => handlePageChange(2, page)}
             actionButton={buttons}
           />
         );
-        case 3:
-            return (
-              <RefundCarData
-                data={data[apiUrls[3]] || []}
-                currentPage={currentPages[3]}
-                totalPages={totalPages}
-                onPageChange={(page) => handlePageChange(3, page)}
-                actionButton={buttons}
-              />
-            );
-          
-            case 4:
-                return (
-                  <RefundHajjData
-                    data={data[apiUrls[4]] || []}
-                    currentPage={currentPages[4]}
-                    totalPages={totalPages}
-                    onPageChange={(page) => handlePageChange(4, page)}
-                    actionButton={buttons}
-                  />
-                );
-         
+      case 3:
+        return (
+          <RefundCarData
+            data={data[refundEndPointUrls[3]] || []}
+            currentPage={currentPages[3]}
+            totalPages={totalPages}
+            onPageChange={(page) => handlePageChange(3, page)}
+            actionButton={buttons}
+          />
+        );
+
+      case 4:
+        return (
+          <RefundHajjData
+            data={data[refundEndPointUrls[4]] || []}
+            currentPage={currentPages[4]}
+            totalPages={totalPages}
+            onPageChange={(page) => handlePageChange(4, page)}
+            actionButton={buttons}
+          />
+        );
+
       default:
         return null;
     }
@@ -200,13 +180,13 @@ const RefundTableWrapper:React.FC  = () => {
       <Export
         ref={exportRef}
         columns={columnMap[activeTab]}
-        data={data[apiUrls[activeTab]] || []}
+        data={data[refundEndPointUrls[activeTab]] || []}
         onExportComplete={() => console.log("Export completed!")}
       />
       {/* Hidden Printable Component */}
       {showPrint && (
         <Print
-        title={"Refund Table Data"}
+          title={"Refund Table Data"}
           data={printData}
           columns={columnMap[activeTab]}
           onClose={() => setShowPrint(false)}
